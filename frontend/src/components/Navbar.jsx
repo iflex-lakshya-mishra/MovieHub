@@ -67,7 +67,10 @@ const Navbar = () => {
   ]
 
   return (
-    <div ref={wrapRef} className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-black/95 backdrop-blur-md shadow-lg' : 'bg-gradient-to-b from-black/80 to-transparent'}`}>
+    <div
+      ref={wrapRef}
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-slate-950/70 backdrop-blur-2xl shadow-[0_8px_30px_rgba(2,6,23,0.35)] border-b border-white/8' : 'bg-gradient-to-b from-slate-950/55 via-slate-950/25 to-transparent'}`}
+    >
       <nav className="flex items-center justify-between px-4 sm:px-8 lg:px-12 py-3 sm:py-4 max-w-screen-2xl mx-auto gap-4">
         {/* Logo */}
         <Link
@@ -78,7 +81,7 @@ const Navbar = () => {
           <img
             src="/logo/logo.png"
             alt="MovieHub"
-            className="w-auto object-contain transition-transform duration-200 ease-out hover:scale-[1.05] filter drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]"
+            className="w-auto object-contain transition-transform duration-200 ease-out hover:scale-[1.05] filter drop-shadow-[0_6px_18px_rgba(15,23,42,0.45)]"
             style={{ height: '40px' }}
           />
           <style>{`
@@ -93,7 +96,7 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-1">
           {navLinks.map(l => (
             <Link key={l.to} to={l.to}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${location.pathname === l.to ? 'bg-red-600 text-white' : 'text-gray-300 hover:text-white hover:bg-white/10'}`}>
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${location.pathname === l.to ? 'bg-gradient-to-r from-cyan-500 to-violet-500 text-white shadow-lg shadow-cyan-500/20' : 'text-slate-300 hover:text-white hover:bg-white/10 hover:shadow-sm'}`}>
               {l.label}
             </Link>
           ))}
@@ -113,9 +116,9 @@ const Navbar = () => {
                 onChange={e => setSearch(e.target.value)}
                 onKeyDown={handleKey}
                 placeholder="Search…"
-                className="w-36 sm:w-52 lg:w-64 pl-9 pr-8 py-2 bg-white/10 border border-white/20 rounded-full text-sm text-white placeholder-gray-400 focus:outline-none focus:bg-white/15 focus:border-red-500/50 transition-all"
+                className="w-36 sm:w-52 lg:w-64 pl-9 pr-8 py-2 bg-white/10 border border-white/15 rounded-full text-sm text-white placeholder-slate-400 focus:outline-none focus:bg-white/15 focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/15 transition-all"
               />
-              {loading && <div className="absolute right-3 w-3.5 h-3.5 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />}
+              {loading && <div className="absolute right-3 w-3.5 h-3.5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />}
               {search && !loading && (
                 <button onClick={() => { setSearch(''); setResults([]) }} className="absolute right-3 text-gray-400 hover:text-white">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -125,10 +128,10 @@ const Navbar = () => {
 
             {/* Dropdown */}
             {results.length > 0 && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-gray-900/98 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+              <div className="absolute right-0 top-full mt-2 w-80 bg-slate-950/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
                 {results.map((item, i) => (
                   <div key={item.tmdbId} onClick={() => handleSelect(item)} onMouseEnter={() => setFocused(i)}
-                    className={`flex gap-3 p-2.5 cursor-pointer transition-colors ${i === focused ? 'bg-red-600/80' : 'hover:bg-white/8'}`}>
+                    className={`flex gap-3 p-2.5 cursor-pointer transition-colors ${i === focused ? 'bg-gradient-to-r from-cyan-500/20 to-violet-500/20' : 'hover:bg-white/8'}`}>
                     <div className="w-10 h-14 shrink-0 rounded-lg overflow-hidden bg-white/10">
                       {item.poster ? <img src={item.poster} alt={item.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-lg">🎬</div>}
                     </div>
@@ -136,7 +139,7 @@ const Navbar = () => {
                       <p className="text-sm font-semibold truncate text-white">{item.title}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-xs text-gray-400">{item.year || '—'}</span>
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${item.media_type === 'movie' ? 'bg-blue-500/25 text-blue-300' : 'bg-purple-500/25 text-purple-300'}`}>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${item.media_type === 'movie' ? 'bg-cyan-500/20 text-cyan-300' : 'bg-violet-500/20 text-violet-300'}`}>
                           {item.media_type === 'movie' ? '🎬 Movie' : '📺 Series'}
                         </span>
                         {item.rating > 0 && <span className="text-[10px] text-yellow-400">★ {item.rating}</span>}
@@ -149,19 +152,19 @@ const Navbar = () => {
           </div>
 
           {/* Watchlist icon */}
-          <Link to="/lists" className="relative hidden sm:flex items-center justify-center w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition">
+          <Link to="/lists" className="relative hidden sm:flex items-center justify-center w-9 h-9 rounded-full bg-white/10 hover:bg-white/15 transition border border-white/8">
             <span className="text-base">🔖</span>
-            {watchlist.length > 0 && <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-[9px] font-bold flex items-center justify-center text-white">{watchlist.length > 9 ? '9+' : watchlist.length}</span>}
+            {watchlist.length > 0 && <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-gradient-to-r from-cyan-500 to-violet-500 rounded-full text-[9px] font-bold flex items-center justify-center text-white">{watchlist.length > 9 ? '9+' : watchlist.length}</span>}
           </Link>
 
           {/* User */}
           {user ? (
             <div className="relative">
-              <button onClick={() => setMenuOpen(p => !p)} className="flex items-center gap-2 rounded-full hover:ring-2 hover:ring-red-500 transition">
+              <button onClick={() => setMenuOpen(p => !p)} className="flex items-center gap-2 rounded-full hover:ring-2 hover:ring-cyan-400/50 transition">
                 <img src={user.avatar} alt={user.username} className="w-8 h-8 rounded-full object-cover bg-gray-700" />
               </button>
               {menuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-52 bg-gray-900/98 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+                <div className="absolute right-0 top-full mt-2 w-52 bg-slate-950/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
                   <div className="p-3 border-b border-white/10">
                     <p className="text-sm font-semibold text-white">{user.username}</p>
                     <p className="text-xs text-gray-400">{favorites.length} favorites · {watchlist.length} watchlist</p>
@@ -173,12 +176,12 @@ const Navbar = () => {
                       { to: '/favorites', label: '❤️ Favorites' },
                     ].map(l => (
                       <Link key={l.to} to={l.to} onClick={() => setMenuOpen(false)}
-                        className="flex items-center px-3 py-2 rounded-xl text-sm text-gray-300 hover:bg-white/10 hover:text-white transition">
+                        className="flex items-center px-3 py-2 rounded-xl text-sm text-slate-300 hover:bg-white/10 hover:text-white transition">
                         {l.label}
                       </Link>
                     ))}
                     <button onClick={() => { logout(); setMenuOpen(false) }}
-                      className="w-full text-left px-3 py-2 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition">
+                      className="w-full text-left px-3 py-2 rounded-xl text-sm text-rose-300 hover:bg-rose-500/10 transition">
                       🚪 Logout
                     </button>
                   </div>
@@ -186,7 +189,7 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <Link to="/login" className="px-4 py-1.5 bg-red-600 hover:bg-red-500 text-white text-sm font-semibold rounded-full transition">
+            <Link to="/login" className="px-4 py-1.5 bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-400 hover:to-violet-400 text-white text-sm font-semibold rounded-full transition shadow-lg shadow-cyan-500/20">
               Login
             </Link>
           )}
@@ -194,10 +197,10 @@ const Navbar = () => {
       </nav>
 
       {/* Mobile nav */}
-      <div className="flex md:hidden items-center justify-around px-4 pb-2 border-t border-white/5">
+      <div className="flex md:hidden items-center justify-around px-4 pb-2 border-t border-white/5 bg-slate-950/35 backdrop-blur-xl">
         {navLinks.map(l => (
           <Link key={l.to} to={l.to}
-            className={`py-1 px-2 text-xs font-medium transition ${location.pathname === l.to ? 'text-red-400' : 'text-gray-400 hover:text-white'}`}>
+            className={`py-1 px-2 text-xs font-medium transition ${location.pathname === l.to ? 'text-cyan-300' : 'text-slate-400 hover:text-white'}`}>
             {l.label}
           </Link>
         ))}
