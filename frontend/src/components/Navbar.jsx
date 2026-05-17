@@ -65,8 +65,23 @@ const Navbar = () => {
     <div ref={wrapRef} className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-black/95 backdrop-blur-md shadow-lg' : 'bg-gradient-to-b from-black/80 to-transparent'}`}>
       <nav className="flex items-center justify-between px-4 sm:px-8 lg:px-12 py-3 sm:py-4 max-w-screen-2xl mx-auto gap-4">
         {/* Logo */}
-        <Link to="/home" className="text-xl sm:text-2xl font-black tracking-tight shrink-0">
-          <span className="text-red-500">Otaku</span><span className="text-white">Flix</span>
+        <Link
+          to="/home"
+          className="shrink-0"
+          aria-label="MovieHub"
+        >
+          <img
+            src="/logo/logo.png"
+            alt="MovieHub"
+            className="w-auto object-contain transition-transform duration-200 ease-out hover:scale-[1.05] filter drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]"
+            style={{ height: '40px' }}
+          />
+          <style>{`
+            @media (max-width: 767px) {
+              /* Mobile navbar height: 32px */
+              img[alt="MovieHub"] { height: 32px !important; }
+            }
+          `}</style>
         </Link>
 
         {/* Nav links - hidden on mobile */}

@@ -6,5 +6,8 @@
     "dev": "cd frontend && npm run dev",
     "build": "cd frontend && npm run build",
     "install:all": "cd frontend && npm install"
+  },
+  "devDependencies": {
+    "vite": "^8.0.13"
   }
 }

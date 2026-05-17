@@ -46,8 +46,12 @@ export default function LoginPage() {
       <div className="relative w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link to="/home" className="text-4xl font-black">
-            <span className="text-red-500">Movie</span><span className="text-white">Hub</span>
+          <Link to="/home" className="inline-flex items-center justify-center">
+            <img
+              src="/logo/logo.png"
+              alt="MovieHub"
+              className="w-40 max-w-[80vw] object-contain transition-transform duration-200 ease-out hover:scale-[1.05] filter drop-shadow-[0_1px_0_rgba(0,0,0,0.6)]"
+            />
           </Link>
           <p className="text-gray-400 mt-2 text-sm">Your personal streaming universe</p>
         </div>
