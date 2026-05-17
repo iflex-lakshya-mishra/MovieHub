@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import LoadingSpinner from './components/LoadingSpinner'
 import { AppProvider, useApp } from './context/AppContext'
 
@@ -29,6 +30,7 @@ function ProtectedRoute({ children }) {
 
 const App = () => (
   <AppProvider>
+    <SpeedInsights />
     <Suspense fallback={<div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center"><LoadingSpinner label="Loading..." /></div>}>
       <Routes>
         <Route path="/"            element={<Navigate to="/home" replace />} />
