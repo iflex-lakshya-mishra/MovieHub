@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 
 export default function LoginPage() {
-  const [tab,      setTab]      = useState('login') // login | register
+  const location = useLocation()
+  const [tab,      setTab]      = useState(location.state?.tab === 'register' ? 'register' : 'login') // login | register
   const [username, setUsername] = useState('')
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')

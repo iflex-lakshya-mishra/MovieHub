@@ -31,6 +31,7 @@ const App = () => (
       <Route path="/"            element={<Navigate to="/home" replace />} />
       <Route path="/home"        element={<Home />} />
       <Route path="/movie"       element={<MoviePage />} />
+      <Route path="/movies"      element={<MoviePage />} />
       <Route path="/anime"       element={<AnimePage />} />
       <Route path="/webseries"   element={<WebSeriesPage />} />
       <Route path="/detail/:mediaType/:tmdbId" element={<MediaDetail />} />
@@ -38,6 +39,7 @@ const App = () => (
       <Route path="/person/:id"  element={<PersonPage />} />
       <Route path="/about"       element={<AboutPage />} />
       <Route path="/login"       element={<LoginPage />} />
+      <Route path="/signup"      element={<Navigate to="/login" replace state={{ tab: 'register' }} />} />
       {/* Protected routes — login required */}
       <Route path="/lists"       element={<ProtectedRoute><ListsPage /></ProtectedRoute>} />
       <Route path="/favorites"   element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
