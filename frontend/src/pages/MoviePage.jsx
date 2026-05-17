@@ -73,11 +73,11 @@ export const MoviePage = () => {
           ) : (
             <>
               <div className="px-4 sm:px-8 lg:px-16 pb-10">
-                <div className="flex items-center gap-3 mb-4"><h2 className="text-xl sm:text-2xl font-bold">🔥 Trending Now</h2><span className="bg-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full text-white animate-pulse">LIVE</span></div>
+                <div className="flex items-center gap-3 mb-4"><h2 className="text-xl sm:text-2xl font-bold">🔥 Trending Now</h2><span className="bg-gradient-to-r from-emerald-500 to-teal-500 text-[10px] font-bold px-2 py-0.5 rounded-full text-white animate-pulse">LIVE</span></div>
                 <MediaRow items={trending} isLoading={loading} />
               </div>
               <div className="px-4 sm:px-8 lg:px-16 pb-10">
-                <div className="flex items-center gap-3 mb-4"><h2 className="text-xl sm:text-2xl font-bold">🎬 Now in Theaters</h2><span className="bg-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full text-white">IN THEATERS</span></div>
+                <div className="flex items-center gap-3 mb-4"><h2 className="text-xl sm:text-2xl font-bold">🎬 Now in Theaters</h2><span className="bg-gradient-to-r from-amber-500 to-orange-500 text-[10px] font-bold px-2 py-0.5 rounded-full text-white">IN THEATERS</span></div>
                 <MediaRow items={nowPlaying} isLoading={loading} />
               </div>
               <div className="px-4 sm:px-8 lg:px-16 pb-10">

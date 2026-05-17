@@ -57,7 +57,7 @@ const AnimePage = () => {
   }
 
   const sections = [
-    { title: '🔥 Trending Anime', items: trending, badge: { text: 'LIVE', color: 'bg-red-600' } },
+    { title: '🔥 Trending Anime', items: trending, badge: { text: 'LIVE', color: 'bg-gradient-to-r from-violet-500 to-purple-500' } },
     { title: '🏆 All Time Classics', items: classic },
     { title: '⚔️ Isekai & Fantasy', items: isekai },
     { title: '🎥 Anime Movies', items: movies },

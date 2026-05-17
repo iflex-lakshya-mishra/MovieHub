@@ -58,10 +58,10 @@ const WebSeriesPage = () => {
 
   const hasAnyItems = trending.length || topRated.length || kdrama.length || intl.length
   const sections = [
-    { title: '🔥 Trending Series', items: trending, badge: { text: 'LIVE', color: 'bg-red-600' } },
+    { title: '🔥 Trending Series', items: trending, badge: { text: 'LIVE', color: 'bg-gradient-to-r from-cyan-500 to-blue-500' } },
     { title: '⭐ Top Rated', items: topRated },
-    { title: '🇰🇷 K-Drama', items: kdrama },
-    { title: '🌍 International Picks', items: intl },
+    { title: '🇰🇷 K-Drama', items: kdrama, badge: { text: 'POPULAR', color: 'bg-gradient-to-r from-rose-500 to-pink-500' } },
+    { title: '🌍 International Picks', items: intl, badge: { text: 'GLOBAL', color: 'bg-gradient-to-r from-indigo-500 to-violet-500' } },
   ]
 
   if (error && !hasAnyItems) {

@@ -7,13 +7,14 @@ import Navbar from '../components/Navbar'
 import RetryButton from '../components/RetryButton'
 import { classifyTmdbError } from '../utils/apiError'
 import {
+    fetchClassicAnimeKitsu, fetchPopularAnimeKitsu,
+    fetchTrendingAnimeKitsu
+} from '../utils/kitsu'
+import {
     fetchBollywood, fetchKDrama,
     fetchTopRatedMovies,
     fetchTrendingMovies, fetchTrendingTV
 } from '../utils/tmdb'
-import {
-    fetchTrendingAnimeKitsu, fetchClassicAnimeKitsu, fetchPopularAnimeKitsu
-} from '../utils/kitsu'
 
 const Section = ({ title, badge, items, loading }) => (
   <div className="px-4 sm:px-8 lg:px-16 mt-2 pb-10">
@@ -102,14 +103,14 @@ const Home = () => {
             </div>
           ) : (
             <>
-              <Section title="🎌 Trending Anime" badge={{ text: 'LIVE', color: 'bg-blue-600' }} items={data.trendingAnime} loading={loading} />
-              <Section title="🌸 Anime Classics" items={data.classicAnime} loading={loading} />
-              <Section title="📺 Popular Anime" items={data.popularAnime} loading={loading} />
-              <Section title="🔥 Trending Movies" badge={{ text: 'LIVE', color: 'bg-red-600' }} items={data.movies} loading={loading} />
-              <Section title="📺 Trending Series" badge={{ text: 'LIVE', color: 'bg-red-600' }} items={data.tv} loading={loading} />
-              <Section title="⭐ Top Rated All Time" items={data.topRated} loading={loading} />
-              <Section title="🇮🇳 Bollywood Hits" items={data.bollywood} loading={loading} />
-              <Section title="🇰🇷 K-Drama" items={data.kdrama} loading={loading} />
+              <Section title="🎌 Trending Anime" badge={{ text: 'LIVE', color: 'bg-gradient-to-r from-violet-500 to-purple-500' }} items={data.trendingAnime} loading={loading} />
+              <Section title="🌸 Anime Classics" badge={{ text: 'BEST', color: 'bg-gradient-to-r from-cyan-500 to-blue-500' }} items={data.classicAnime} loading={loading} />
+              <Section title="📺 Popular Anime" badge={{ text: 'HOT', color: 'bg-gradient-to-r from-indigo-500 to-violet-500' }} items={data.popularAnime} loading={loading} />
+              <Section title="🔥 Trending Movies" badge={{ text: 'LIVE', color: 'bg-gradient-to-r from-emerald-500 to-teal-500' }} items={data.movies} loading={loading} />
+              <Section title="📺 Trending Series" badge={{ text: 'LIVE', color: 'bg-gradient-to-r from-amber-500 to-orange-500' }} items={data.tv} loading={loading} />
+              <Section title="⭐ Top Rated All Time" badge={{ text: 'CLASSIC', color: 'bg-gradient-to-r from-yellow-500 to-amber-500' }} items={data.topRated} loading={loading} />
+              <Section title="🇮🇳 Bollywood Hits" badge={{ text: 'TRENDING', color: 'bg-gradient-to-r from-pink-500 to-rose-500' }} items={data.bollywood} loading={loading} />
+              <Section title="🇰🇷 K-Drama" badge={{ text: 'POPULAR', color: 'bg-gradient-to-r from-rose-500 to-pink-500' }} items={data.kdrama} loading={loading} />
             </>
           )}
         </div>
