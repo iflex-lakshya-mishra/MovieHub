@@ -1,5 +1,21 @@
 {
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/manifest+json" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    }
+  ],
   "rewrites": [
-    { "source": "/(?!.*\\.)", "destination": "/index.html" }
+    { "source": "/(?!.*\\.(json|png|jpg|jpeg|gif|svg|css|js|ico|woff|woff2)$)", "destination": "/index.html" }
   ]
 }

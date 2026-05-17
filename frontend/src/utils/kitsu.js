@@ -43,12 +43,21 @@ async function kitsuFetch(path, params = {}) {
 function normalizeKitsuAnime(anime) {
   if (!anime?.attributes) return null
   const attr = anime.attributes
+  
+  // Extract poster URL - Kitsu returns poster as an object with url property
+  const posterUrl = attr.posterImage?.original || attr.posterImage?.medium || attr.posterImage?.url || ''
+  const backdropUrl = attr.coverImage?.original || attr.coverImage?.url || posterUrl || ''
+  
+  // Ensure URLs are absolute and properly formatted
+  const cleanPoster = posterUrl ? (posterUrl.startsWith('http') ? posterUrl : `https:${posterUrl}`) : ''
+  const cleanBackdrop = backdropUrl ? (backdropUrl.startsWith('http') ? backdropUrl : `https:${backdropUrl}`) : cleanPoster
+  
   return {
     id: anime.id,
     tmdbId: anime.id,
     title: attr.titles?.en || attr.canonicalTitle || 'Unknown',
-    poster: attr.posterImage?.medium || attr.posterImage?.original || '',
-    backdrop: attr.coverImage?.original || attr.posterImage?.original || '',
+    poster: cleanPoster,
+    backdrop: cleanBackdrop,
     description: attr.synopsis || '',
     rating: attr.averageRating ? parseFloat(attr.averageRating) / 10 : null,
     mediaType: 'tv',
@@ -64,7 +73,7 @@ export const fetchTrendingAnimeKitsu = async () => {
       'filter[status]': 'current,finished',
       'sort': '-userCount',
       'include': 'genres',
-      'fields[anime]': 'canonicalTitle,titles,synopsis,posterImage,coverImage,averageRating,genres',
+      'fields[anime]': 'canonicalTitle,titles,synopsis,posterImage,coverImage,averageRating,genres,youtubeVideoId',
     })
     return (data?.data || [])
       .map(normalizeKitsuAnime)
