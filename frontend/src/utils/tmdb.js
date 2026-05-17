@@ -1,14 +1,15 @@
-const KEY = '8265bd1679663a7ea12ac168da84d2e8'
+const KEY = import.meta.env.VITE_TMDB_API_KEY || import.meta.env.VITE_TMDB_KEY || '8265bd1679663a7ea12ac168da84d2e8'
 const BASE = 'https://api.themoviedb.org/3'
+const IMAGE_BASE = import.meta.env.VITE_TMDB_IMAGE_BASE || 'https://image.tmdb.org/t/p'
 
 // w342 posters (fast), w780 backdrop (orig bahut bada tha)
 export const IMG = {
-  w92:  'https://image.tmdb.org/t/p/w92',
-  w185: 'https://image.tmdb.org/t/p/w185',
-  w342: 'https://image.tmdb.org/t/p/w342',
-  w500: 'https://image.tmdb.org/t/p/w500',
-  w780: 'https://image.tmdb.org/t/p/w780',
-  orig: 'https://image.tmdb.org/t/p/original',
+  w92:  `${IMAGE_BASE}/w92`,
+  w185: `${IMAGE_BASE}/w185`,
+  w342: `${IMAGE_BASE}/w342`,
+  w500: `${IMAGE_BASE}/w500`,
+  w780: `${IMAGE_BASE}/w780`,
+  orig: `${IMAGE_BASE}/original`,
 }
 
 // localStorage cache — reload pe bhi fast

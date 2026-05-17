@@ -1,14 +1,30 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import {
-  onAuthStateChanged, signInWithPopup, signInWithEmailAndPassword,
-  createUserWithEmailAndPassword, updateProfile, signOut,
+    createUserWithEmailAndPassword,
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    signInWithPopup, signInWithRedirect,
+    signOut,
+    updateProfile,
 } from 'firebase/auth'
 import {
-  doc, getDoc, setDoc, updateDoc,
-  collection, addDoc, deleteDoc, onSnapshot, query, where,
-  arrayUnion, arrayRemove, serverTimestamp,
+    addDoc,
+    arrayRemove,
+    arrayUnion,
+    collection,
+    deleteDoc,
+    doc, getDoc,
+    onSnapshot, query,
+    serverTimestamp,
+    setDoc, updateDoc,
+    where,
 } from 'firebase/firestore'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { auth, db, googleProvider } from '../utils/firebase'
+
+const isPopupBlockedError = (err) => {
+  const code = err?.code || ''
+  return code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request'
+}
 
 const AppContext = createContext(null)
 const LS = {
@@ -64,7 +80,17 @@ export function AppProvider({ children }) {
   }, [syncUserDoc])
 
   // Auth
-  const loginWithGoogle    = useCallback(() => signInWithPopup(auth, googleProvider), [])
+  const loginWithGoogle    = useCallback(async () => {
+    try {
+      return await signInWithPopup(auth, googleProvider)
+    } catch (err) {
+      if (isPopupBlockedError(err)) {
+        await signInWithRedirect(auth, googleProvider)
+        return null
+      }
+      throw err
+    }
+  }, [])
   const loginWithEmail     = useCallback((email, pw) => signInWithEmailAndPassword(auth, email, pw), [])
   const registerWithEmail  = useCallback(async (username, email, pw) => {
     const { user: u } = await createUserWithEmailAndPassword(auth, email, pw)

@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 
 export default function LoginPage() {
@@ -9,8 +9,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
-  const { loginWithGoogle, loginWithEmail, registerWithEmail } = useApp()
+  const { user, loginWithGoogle, loginWithEmail, registerWithEmail } = useApp()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (user) navigate('/home', { replace: true })
+  }, [user, navigate])
 
   const handle = async (e) => {
     e.preventDefault()
@@ -31,7 +35,10 @@ export default function LoginPage() {
 
   const handleGoogle = async () => {
     setError(''); setLoading(true)
-    try { await loginWithGoogle(); navigate('/home') }
+    try {
+      const result = await loginWithGoogle()
+      if (result) navigate('/home')
+    }
     catch (err) { setError(err.message || 'Google login failed') }
     setLoading(false)
   }
