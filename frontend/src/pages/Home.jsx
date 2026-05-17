@@ -9,9 +9,11 @@ import { classifyTmdbError } from '../utils/apiError'
 import {
     fetchBollywood, fetchKDrama,
     fetchTopRatedMovies,
-    fetchTrendingAnime,
     fetchTrendingMovies, fetchTrendingTV
 } from '../utils/tmdb'
+import {
+    fetchTrendingAnimeKitsu, fetchClassicAnimeKitsu, fetchPopularAnimeKitsu
+} from '../utils/kitsu'
 
 const Section = ({ title, badge, items, loading }) => (
   <div className="px-4 sm:px-8 lg:px-16 mt-2 pb-10">
@@ -24,7 +26,7 @@ const Section = ({ title, badge, items, loading }) => (
 )
 
 const Home = () => {
-  const [data, setData] = useState({ movies: [], tv: [], anime: [], topRated: [], bollywood: [], kdrama: [] })
+  const [data, setData] = useState({ trendingAnime: [], classicAnime: [], popularAnime: [], movies: [], tv: [], topRated: [], bollywood: [], kdrama: [] })
   const [hero, setHero] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -32,10 +34,13 @@ const Home = () => {
   const loadData = useCallback(async () => {
     setLoading(true)
     setError(null)
+    // Anime first from Kitsu, then TMDB for movies/series
     const settled = await Promise.allSettled([
+      fetchTrendingAnimeKitsu(),
+      fetchClassicAnimeKitsu(),
+      fetchPopularAnimeKitsu(),
       fetchTrendingMovies(),
       fetchTrendingTV(),
-      fetchTrendingAnime(),
       fetchTopRatedMovies(),
       fetchBollywood(),
       fetchKDrama(),
@@ -43,16 +48,19 @@ const Home = () => {
 
     const values = settled.map(result => (result.status === 'fulfilled' ? result.value : []))
     const nextData = {
-      movies: values[0].slice(0, 15),
-      tv: values[1].slice(0, 15),
-      anime: values[2].slice(0, 15),
-      topRated: values[3].slice(0, 15),
-      bollywood: values[4].slice(0, 15),
-      kdrama: values[5].slice(0, 15),
+      trendingAnime: values[0].slice(0, 15),
+      classicAnime: values[1].slice(0, 15),
+      popularAnime: values[2].slice(0, 15),
+      movies: values[3].slice(0, 15),
+      tv: values[4].slice(0, 15),
+      topRated: values[5].slice(0, 15),
+      bollywood: values[6].slice(0, 15),
+      kdrama: values[7].slice(0, 15),
     }
 
     setData(nextData)
-    setHero([...nextData.movies, ...nextData.tv].filter(i => i.backdrop).slice(0, 8))
+    // Hero from anime first, then movies
+    setHero([...nextData.trendingAnime, ...nextData.movies, ...nextData.tv].filter(i => i.backdrop).slice(0, 8))
 
     const hasAnyItems = Object.values(nextData).some(items => items.length > 0)
     const firstFailure = settled.find(result => result.status === 'rejected')?.reason
@@ -94,9 +102,11 @@ const Home = () => {
             </div>
           ) : (
             <>
+              <Section title="🎌 Trending Anime" badge={{ text: 'LIVE', color: 'bg-blue-600' }} items={data.trendingAnime} loading={loading} />
+              <Section title="🌸 Anime Classics" items={data.classicAnime} loading={loading} />
+              <Section title="📺 Popular Anime" items={data.popularAnime} loading={loading} />
               <Section title="🔥 Trending Movies" badge={{ text: 'LIVE', color: 'bg-red-600' }} items={data.movies} loading={loading} />
               <Section title="📺 Trending Series" badge={{ text: 'LIVE', color: 'bg-red-600' }} items={data.tv} loading={loading} />
-              <Section title="🌸 Trending Anime" badge={{ text: 'LIVE', color: 'bg-red-600' }} items={data.anime} loading={loading} />
               <Section title="⭐ Top Rated All Time" items={data.topRated} loading={loading} />
               <Section title="🇮🇳 Bollywood Hits" items={data.bollywood} loading={loading} />
               <Section title="🇰🇷 K-Drama" items={data.kdrama} loading={loading} />
