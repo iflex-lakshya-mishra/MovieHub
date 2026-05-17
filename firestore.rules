@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users — sirf apna data dekh/edit kar sakte hain
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Lists — public lists sab dekh sakte hain, sirf owner edit kar sakta hai
+    match /lists/{listId} {
+      allow read: if resource.data.isPublic == true
+                  || (request.auth != null && request.auth.uid == resource.data.ownerId);
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null
+                             && request.auth.uid == resource.data.ownerId;
+    }
+  }
+}

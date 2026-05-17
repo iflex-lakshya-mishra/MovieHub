@@ -1,0 +1,13 @@
+{
+  "name": "MovieHub",
+  "short_name": "MovieHub",
+  "description": "Discover movies, anime & web series",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#ef4444",
+  "icons": [
+    { "src": "https://api.dicebear.com/7.x/thumbs/svg?seed=moviehub", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "https://api.dicebear.com/7.x/thumbs/svg?seed=moviehub", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

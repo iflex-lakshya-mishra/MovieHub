@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+* { box-sizing: border-box; }
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Smooth page transitions */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better tap targets on mobile */
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* PWA safe area */
+body {
+  /* Safe-area padding (avoid invalid declaration causing Tailwind build error) */
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+}
+
