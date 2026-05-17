@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { searchMulti } from '../utils/tmdb'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
+import { searchMulti } from '../utils/tmdb'
 
 const Navbar = () => {
   const [search, setSearch] = useState('')
@@ -24,9 +24,14 @@ const Navbar = () => {
   const doSearch = useCallback(async (q) => {
     if (!q.trim()) { setResults([]); return }
     setLoading(true)
-    const { results: r } = await searchMulti(q)
-    setResults(r.slice(0, 7))
-    setLoading(false)
+    try {
+      const { results: r } = await searchMulti(q)
+      setResults(r.slice(0, 7))
+    } catch {
+      setResults([])
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => {

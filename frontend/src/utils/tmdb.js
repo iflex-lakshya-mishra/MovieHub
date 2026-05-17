@@ -1,6 +1,7 @@
 const KEY = import.meta.env.VITE_TMDB_API_KEY || import.meta.env.VITE_TMDB_KEY || '8265bd1679663a7ea12ac168da84d2e8'
 const BASE = 'https://api.themoviedb.org/3'
 const IMAGE_BASE = import.meta.env.VITE_TMDB_IMAGE_BASE || 'https://image.tmdb.org/t/p'
+const TIMEOUT_MS = Number(import.meta.env.VITE_TMDB_TIMEOUT_MS || 12000)
 
 // w342 posters (fast), w780 backdrop (orig bahut bada tha)
 export const IMG = {
@@ -31,20 +32,43 @@ function lsSet(key, data) {
 
 const memCache = new Map()
 
+function createTmdbError(code, status, message, cause) {
+  const err = new Error(message)
+  err.code = code
+  err.status = status
+  if (cause) err.cause = cause
+  return err
+}
+
 async function tmdb(path, params = {}) {
   const url = `${BASE}${path}?api_key=${KEY}&language=en-US&${new URLSearchParams(params)}`
   const cacheKey = path + JSON.stringify(params)
   if (memCache.has(url)) return memCache.get(url)
   const cached = lsGet(cacheKey)
   if (cached) { memCache.set(url, cached); return cached }
+
+  const controller = new AbortController()
+  const timeoutId = window.setTimeout(() => controller.abort(), TIMEOUT_MS)
+
   try {
-    const r = await fetch(url)
-    if (!r.ok) return null
+    const r = await fetch(url, { signal: controller.signal })
+    if (!r.ok) {
+      if (r.status === 401 || r.status === 403) throw createTmdbError('AUTH', r.status, 'TMDB authentication failed. Check your API key.')
+      if (r.status === 404) throw createTmdbError('NOT_FOUND', r.status, 'TMDB resource was not found.')
+      if (r.status === 429) throw createTmdbError('RATE_LIMIT', r.status, 'TMDB rate limit exceeded. Please retry shortly.')
+      throw createTmdbError('HTTP', r.status, `TMDB request failed with status ${r.status}.`)
+    }
     const d = await r.json()
     memCache.set(url, d)
     lsSet(cacheKey, d)
     return d
-  } catch { return null }
+  } catch (err) {
+    if (err?.name === 'AbortError') throw createTmdbError('TIMEOUT', 0, 'TMDB request timed out. Please try again.')
+    if (err?.code) throw err
+    throw createTmdbError('NETWORK', 0, 'TMDB request failed. Please check your connection.', err)
+  } finally {
+    window.clearTimeout(timeoutId)
+  }
 }
 
 export const fetchTrending = async (type = 'all', window = 'week') => {

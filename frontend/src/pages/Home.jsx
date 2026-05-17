@@ -1,10 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '../components/Navbar'
-import MediaRow from '../components/MediaRow'
+import { useCallback, useEffect, useState } from 'react'
+import EmptyState from '../components/EmptyState'
+import ErrorPage from '../components/ErrorPage'
 import HeroSection from '../components/HeroSection'
+import MediaRow from '../components/MediaRow'
+import Navbar from '../components/Navbar'
+import RetryButton from '../components/RetryButton'
+import { classifyTmdbError } from '../utils/apiError'
 import {
-  fetchTrendingMovies, fetchTrendingTV, fetchTrendingAnime,
-  fetchTopRatedMovies, fetchBollywood, fetchKDrama
+    fetchBollywood, fetchKDrama,
+    fetchTopRatedMovies,
+    fetchTrendingAnime,
+    fetchTrendingMovies, fetchTrendingTV
 } from '../utils/tmdb'
 
 const Section = ({ title, badge, items, loading }) => (
@@ -21,39 +27,81 @@ const Home = () => {
   const [data, setData] = useState({ movies: [], tv: [], anime: [], topRated: [], bollywood: [], kdrama: [] })
   const [hero, setHero] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  const loadData = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    const settled = await Promise.allSettled([
+      fetchTrendingMovies(),
+      fetchTrendingTV(),
+      fetchTrendingAnime(),
+      fetchTopRatedMovies(),
+      fetchBollywood(),
+      fetchKDrama(),
+    ])
+
+    const values = settled.map(result => (result.status === 'fulfilled' ? result.value : []))
+    const nextData = {
+      movies: values[0].slice(0, 15),
+      tv: values[1].slice(0, 15),
+      anime: values[2].slice(0, 15),
+      topRated: values[3].slice(0, 15),
+      bollywood: values[4].slice(0, 15),
+      kdrama: values[5].slice(0, 15),
+    }
+
+    setData(nextData)
+    setHero([...nextData.movies, ...nextData.tv].filter(i => i.backdrop).slice(0, 8))
+
+    const hasAnyItems = Object.values(nextData).some(items => items.length > 0)
+    const firstFailure = settled.find(result => result.status === 'rejected')?.reason
+    if (!hasAnyItems && firstFailure) setError(classifyTmdbError(firstFailure))
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      const [movies, tv, anime, topRated, bollywood, kdrama] = await Promise.all([
-        fetchTrendingMovies(),
-        fetchTrendingTV(),
-        fetchTrendingAnime(),
-        fetchTopRatedMovies(),
-        fetchBollywood(),
-        fetchKDrama(),
-      ])
-      setData({ movies: movies.slice(0,15), tv: tv.slice(0,15), anime: anime.slice(0,15), topRated: topRated.slice(0,15), bollywood: bollywood.slice(0,15), kdrama: kdrama.slice(0,15) })
-      // Hero: mix of trending movies + tv with backdrops
-      setHero([...movies, ...tv].filter(i => i.backdrop).slice(0, 8))
-      setLoading(false)
-    }
-    load()
-  }, [])
+    loadData()
+  }, [loadData])
+
+  const hasAnyItems = Object.values(data).some(items => items.length > 0)
+
+  if (error && !hasAnyItems) {
+    return (
+      <div className="bg-[#0a0a0a] text-white min-h-screen">
+        <Navbar />
+        <div className="pt-[80px] md:pt-[88px] px-4 sm:px-8 lg:px-16 pb-20">
+          <ErrorPage title={error.title} message={error.message} onRetry={loadData} />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-[#0a0a0a] text-white min-h-screen">
       <Navbar />
       <div className="pt-[60px] md:pt-[68px]">
-        <HeroSection items={hero} title="MovieHub" subtitle="Watch trending anime, movies & web series" />
+        <HeroSection items={hero} loading={loading} title="MovieHub" subtitle="Watch trending anime, movies & web series" />
 
         <div className="relative -mt-16 z-20">
-          <Section title="🔥 Trending Movies" badge={{ text: 'LIVE', color: 'bg-red-600' }} items={data.movies} loading={loading} />
-          <Section title="📺 Trending Series" badge={{ text: 'LIVE', color: 'bg-red-600' }} items={data.tv} loading={loading} />
-          <Section title="🌸 Trending Anime" badge={{ text: 'LIVE', color: 'bg-red-600' }} items={data.anime} loading={loading} />
-          <Section title="⭐ Top Rated All Time" items={data.topRated} loading={loading} />
-          <Section title="🇮🇳 Bollywood Hits" items={data.bollywood} loading={loading} />
-          <Section title="🇰🇷 K-Drama" items={data.kdrama} loading={loading} />
+          {!loading && !hasAnyItems ? (
+            <div className="px-4 sm:px-8 lg:px-16 pb-20">
+              <EmptyState
+                title="No movies found"
+                description="TMDB returned no content right now. Try again in a moment."
+                action={<RetryButton onRetry={loadData} label="Retry" />}
+              />
+            </div>
+          ) : (
+            <>
+              <Section title="🔥 Trending Movies" badge={{ text: 'LIVE', color: 'bg-red-600' }} items={data.movies} loading={loading} />
+              <Section title="📺 Trending Series" badge={{ text: 'LIVE', color: 'bg-red-600' }} items={data.tv} loading={loading} />
+              <Section title="🌸 Trending Anime" badge={{ text: 'LIVE', color: 'bg-red-600' }} items={data.anime} loading={loading} />
+              <Section title="⭐ Top Rated All Time" items={data.topRated} loading={loading} />
+              <Section title="🇮🇳 Bollywood Hits" items={data.bollywood} loading={loading} />
+              <Section title="🇰🇷 K-Drama" items={data.kdrama} loading={loading} />
+            </>
+          )}
         </div>
       </div>
     </div>

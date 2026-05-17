@@ -1,27 +1,45 @@
-import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar'
+import { useCallback, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import ErrorPage from '../components/ErrorPage'
+import LoadingSpinner from '../components/LoadingSpinner'
 import MediaRow from '../components/MediaRow'
-import { fetchPerson, normalise, IMG } from '../utils/tmdb'
+import Navbar from '../components/Navbar'
+import { classifyTmdbError } from '../utils/apiError'
+import { fetchPerson, IMG, normalise } from '../utils/tmdb'
 
 const PersonPage = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [person, setPerson] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [showFull, setShowFull] = useState(false)
 
-  useEffect(() => {
+  const loadPerson = useCallback(async () => {
     window.scrollTo(0, 0)
     setLoading(true)
-    fetchPerson(id).then(d => { setPerson(d); setLoading(false) })
+    setError(null)
+    setPerson(null)
+    try {
+      const d = await fetchPerson(id)
+      setPerson(d)
+    } catch (err) {
+      setError(classifyTmdbError(err))
+    } finally {
+      setLoading(false)
+    }
   }, [id])
+
+  useEffect(() => {
+    loadPerson()
+  }, [loadPerson])
 
   if (loading) return (
     <div className="bg-[#0a0a0a] min-h-screen flex items-center justify-center">
-      <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
+      <LoadingSpinner size={48} label="Loading..." />
     </div>
   )
+  if (error) return <ErrorPage title={error.title} message={error.message} onRetry={loadPerson} />
   if (!person) return (
     <div className="bg-[#0a0a0a] min-h-screen flex items-center justify-center text-white">
       <div className="text-center"><p className="text-xl mb-4">Person not found</p>

@@ -1,5 +1,5 @@
 const CACHE = 'otakuflix-v1'
-const STATIC = ['/', '/index.html', '/manifest.json']
+const STATIC = ['/', '/index.html']
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(STATIC)).then(() => self.skipWaiting()))

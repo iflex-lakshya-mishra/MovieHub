@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import Navbar from '../components/Navbar'
+import { useCallback, useEffect, useState } from 'react'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import ErrorPage from '../components/ErrorPage'
+import LoadingSpinner from '../components/LoadingSpinner'
 import MediaRow from '../components/MediaRow'
-import { fetchDetails, resolveByImdbId, getProviders, normalise, IMG } from '../utils/tmdb'
+import Navbar from '../components/Navbar'
 import { useApp } from '../context/AppContext'
+import { classifyTmdbError } from '../utils/apiError'
+import { fetchDetails, getProviders, IMG, normalise, resolveByImdbId } from '../utils/tmdb'
 
 const Badge = ({ children, color = 'bg-white/10' }) => (
   <span className={`${color} px-3 py-1 rounded-full text-xs font-medium text-white border border-white/10`}>{children}</span>
@@ -17,35 +20,49 @@ const MediaDetail = () => {
 
   const [details, setDetails] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [showTrailer, setShowTrailer] = useState(false)
   const [activeTab, setActiveTab] = useState('about')
 
   const { toggleFav, isFav, toggleWatchlist, inWatchlist, lists, addToList, user } = useApp()
 
-  useEffect(() => {
+  const loadDetails = useCallback(async () => {
     window.scrollTo(0, 0)
-    const load = async () => {
-      setLoading(true)
+    setLoading(true)
+    setError(null)
+    setDetails(null)
+    try {
       let id = tmdbId, type = mediaType
       if (!id && (imdbID || passedItem?.imdbID)) {
         const found = await resolveByImdbId(imdbID || passedItem?.imdbID)
         if (found) { id = found.id; type = found.media_type }
       }
-      if (!id || !type) { setLoading(false); return }
+      if (!id || !type) throw new Error('Missing media identifier')
       const d = await fetchDetails(id, type)
       setDetails(d)
+    } catch (err) {
+      setError(classifyTmdbError(err))
+    } finally {
       setLoading(false)
     }
-    load()
-  }, [tmdbId, mediaType, imdbID])
+  }, [tmdbId, mediaType, imdbID, passedItem?.imdbID])
+
+  useEffect(() => {
+    loadDetails()
+  }, [loadDetails])
 
   if (loading) return (
     <div className="bg-[#0a0a0a] min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-12 h-12 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-white text-lg">Loading…</p>
-      </div>
+      <LoadingSpinner size={48} label="Loading..." />
     </div>
+  )
+
+  if (error) return (
+    <ErrorPage
+      title={error.title}
+      message={error.message}
+      onRetry={loadDetails}
+    />
   )
 
   if (!details) return (

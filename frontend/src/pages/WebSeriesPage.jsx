@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '../components/Navbar'
-import MediaRow from '../components/MediaRow'
+import { useCallback, useEffect, useState } from 'react'
+import EmptyState from '../components/EmptyState'
+import ErrorPage from '../components/ErrorPage'
 import HeroSection from '../components/HeroSection'
-import { fetchTrendingTV, fetchTopRatedTV, fetchKDrama, fetchPosterByImdb } from '../utils/tmdb'
+import MediaRow from '../components/MediaRow'
+import Navbar from '../components/Navbar'
+import RetryButton from '../components/RetryButton'
+import { classifyTmdbError } from '../utils/apiError'
+import { fetchKDrama, fetchPosterByImdb, fetchTopRatedTV, fetchTrendingTV } from '../utils/tmdb'
 
 const internationalShows = [
   { imdbID: 'tt6468322', title: 'Money Heist' },
@@ -21,36 +25,72 @@ const WebSeriesPage = () => {
   const [kdrama, setKdrama] = useState([])
   const [intl, setIntl] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  useEffect(() => {
+  const loadSeries = useCallback(async () => {
     setLoading(true)
-    Promise.all([
+    setError(null)
+    const settled = await Promise.allSettled([
       fetchTrendingTV(),
       fetchTopRatedTV(),
       fetchKDrama(),
-      Promise.all(internationalShows.map(async item => {
+      Promise.allSettled(internationalShows.map(async item => {
         const extra = await fetchPosterByImdb(item)
         return { ...item, ...extra, media_type: 'tv' }
-      }))
-    ]).then(([t, r, kd, il]) => {
-      setTrending(t.slice(0,15)); setTopRated(r.slice(0,15))
-      setKdrama(kd.slice(0,15)); setIntl(il)
-      setLoading(false)
-    })
+      })).then(results => results.map(result => (result.status === 'fulfilled' ? result.value : null)).filter(Boolean)),
+    ])
+
+    const values = settled.map(result => (result.status === 'fulfilled' ? result.value : []))
+    setTrending(values[0].slice(0, 15))
+    setTopRated(values[1].slice(0, 15))
+    setKdrama(values[2].slice(0, 15))
+    setIntl(values[3])
+
+    const hasAnyItems = values.some(items => items.length > 0)
+    const firstFailure = settled.find(result => result.status === 'rejected')?.reason
+    if (!hasAnyItems && firstFailure) setError(classifyTmdbError(firstFailure))
+    setLoading(false)
   }, [])
+
+  useEffect(() => {
+    loadSeries()
+  }, [loadSeries])
+
+  const hasAnyItems = trending.length || topRated.length || kdrama.length || intl.length
+  const sections = [
+    { title: '🔥 Trending Series', items: trending, badge: { text: 'LIVE', color: 'bg-red-600' } },
+    { title: '⭐ Top Rated', items: topRated },
+    { title: '🇰🇷 K-Drama', items: kdrama },
+    { title: '🌍 International Picks', items: intl },
+  ]
+
+  if (error && !hasAnyItems) {
+    return (
+      <div className="bg-[#0a0a0a] text-white min-h-screen">
+        <Navbar />
+        <div className="pt-[80px] md:pt-[88px] px-4 sm:px-8 lg:px-16 pb-20">
+          <ErrorPage title={error.title} message={error.message} onRetry={loadSeries} />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-[#0a0a0a] text-white min-h-screen">
       <Navbar />
       <div className="pt-[60px] md:pt-[68px]">
-        <HeroSection items={trending.filter(i => i.backdrop).slice(0,6)} title="Web Series" subtitle="Trending shows, K-Dramas, and global picks" />
+        <HeroSection items={trending.filter(i => i.backdrop).slice(0,6)} loading={loading} title="Web Series" subtitle="Trending shows, K-Dramas, and global picks" />
         <div className="relative -mt-16 z-20">
-          {[
-            { title: '🔥 Trending Series', items: trending, badge: { text: 'LIVE', color: 'bg-red-600' } },
-            { title: '⭐ Top Rated', items: topRated },
-            { title: '🇰🇷 K-Drama', items: kdrama },
-            { title: '🌍 International Picks', items: intl },
-          ].map(({ title, items, badge }) => (
+          {!loading && !hasAnyItems ? (
+            <div className="px-4 sm:px-8 lg:px-16 pb-20">
+              <EmptyState
+                title="No movies found"
+                description="TMDB returned no series data right now. Try again shortly."
+                action={<RetryButton onRetry={loadSeries} label="Retry" />}
+              />
+            </div>
+          ) : (
+            sections.map(({ title, items, badge }) => (
             <div key={title} className="px-4 sm:px-8 lg:px-16 pb-10">
               <div className="flex items-center gap-3 mb-4">
                 <h2 className="text-xl sm:text-2xl font-bold">{title}</h2>
@@ -58,7 +98,8 @@ const WebSeriesPage = () => {
               </div>
               <MediaRow items={items} isLoading={loading} />
             </div>
-          ))}
+          ))
+          )}
         </div>
       </div>
     </div>

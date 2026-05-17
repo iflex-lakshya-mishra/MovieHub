@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 
-const HeroSection = ({ items = [], title = 'MovieHub', subtitle = 'Watch movies, anime & web series' }) => {
+const HeroSection = ({ items = [], title = 'MovieHub', subtitle = 'Watch movies, anime & web series', loading = false }) => {
   const [current, setCurrent] = useState(0)
   const [showTrailer, setShowTrailer] = useState(false)
   const navigate = useNavigate()
@@ -15,6 +15,30 @@ const HeroSection = ({ items = [], title = 'MovieHub', subtitle = 'Watch movies,
     const t = setInterval(() => setCurrent(p => (p + 1) % items.length), 7000)
     return () => clearInterval(t)
   }, [items.length])
+
+  if (loading && !item) return (
+    <div className="relative w-full h-[55vh] sm:h-[65vh] lg:h-[80vh] overflow-hidden bg-gradient-to-b from-gray-950 via-black to-gray-950">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(239,68,68,0.18),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.12),transparent_28%)]" />
+      <div className="absolute inset-0 flex flex-col justify-end pb-12 sm:pb-16 px-6 sm:px-12 lg:px-20 z-10 max-w-3xl animate-pulse">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="h-5 w-20 rounded-full bg-white/10" />
+          <div className="h-4 w-16 rounded-full bg-white/10" />
+          <div className="h-4 w-10 rounded-full bg-white/10" />
+        </div>
+        <div className="h-14 sm:h-16 lg:h-24 w-[80%] bg-white/10 rounded-2xl mb-4" />
+        <div className="space-y-2 mb-6 w-full max-w-lg">
+          <div className="h-3 bg-white/10 rounded-full" />
+          <div className="h-3 bg-white/10 rounded-full w-[92%]" />
+          <div className="h-3 bg-white/10 rounded-full w-[78%]" />
+        </div>
+        <div className="flex gap-3">
+          <div className="h-11 w-36 rounded-full bg-white/10" />
+          <div className="h-11 w-32 rounded-full bg-white/10" />
+          <div className="h-10 w-10 rounded-full bg-white/10" />
+        </div>
+      </div>
+    </div>
+  )
 
   if (!item) return (
     <div className="w-full h-[50vh] bg-gradient-to-b from-gray-900 to-black flex items-end pb-20 px-8">
