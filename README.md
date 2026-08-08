@@ -37,7 +37,7 @@ A modern movie, anime, and web series discovery app built with **React, Firebase
 ### 1. Clone the repository
 
 
-
-```bash
+git clone https://github.com/iflex-lakshya-mishra/MovieHub.git
+cd MovieHub
 git clone https://github.com/iflex-lakshya-mishra/MovieHub.git
 cd MovieHub
