@@ -23,6 +23,8 @@ frontend/.env.local
 .firebaserc
 firebase.json
 public/
+!frontend/public/
+!frontend/public/**
 skills-lock.json
 
 # Firebase
