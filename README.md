@@ -30,12 +30,4 @@ A modern movie, anime, and web series discovery app built with **React, Firebase
 | PWA | Service Worker + Web Manifest |
 | Deployment | Vercel |
 
----
-
-## 🚀 Getting Started
-
-### 1. Clone the repository
-
-
-git clone https://github.com/iflex-lakshya-mishra/MovieHub.git
-cd MovieHub
+  
