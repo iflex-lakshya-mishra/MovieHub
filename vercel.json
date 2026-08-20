@@ -6,7 +6,7 @@
   "outputDirectory": "frontend/dist",
   "rewrites": [
     {
-      "source": "/((?!.*\\.(json|png|jpg|jpeg|gif|svg|css|js|ico|woff|woff2)$).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
