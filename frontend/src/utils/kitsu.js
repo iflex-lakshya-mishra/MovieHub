@@ -72,8 +72,7 @@ export const fetchTrendingAnimeKitsu = async () => {
       'page[limit]': 25,
       'filter[status]': 'current,finished',
       'sort': '-userCount',
-      'include': 'genres',
-      'fields[anime]': 'canonicalTitle,titles,synopsis,posterImage,coverImage,averageRating,genres,youtubeVideoId',
+      'fields[anime]': 'canonicalTitle,titles,synopsis,posterImage,coverImage,averageRating',
     })
     return (data?.data || [])
       .map(normalizeKitsuAnime)
