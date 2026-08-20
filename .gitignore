@@ -17,6 +17,14 @@ build/
 frontend/.env
 frontend/.env.local
 
+# Local agent and deployment scaffolding
+.agents/
+.github/
+.firebaserc
+firebase.json
+public/
+skills-lock.json
+
 # Firebase
 .firebase/
 firebase-debug.log
